@@ -1,0 +1,23 @@
+# application.yml của restaurant-service — ĐÃ SỬA
+# Sửa 2 lỗi: (1) tên service nhất quán kebab-case, (2) defaultZone thêm dấu "/" ở cuối
+
+spring:
+  application:
+    name: restaurant-service        # SỬA: trước là "RestaurantService" (lệch quy ước)
+
+server:
+  port: 8085
+
+eureka:
+  client:
+    service-url:
+      # SỬA: thêm dấu "/" ở cuối -> đúng endpoint đăng ký của Eureka
+      defaultZone: http://eureka-server:8761/eureka/
+    register-with-eureka: true       # khai báo rõ ràng: service tự đăng ký lên Eureka
+    fetch-registry: true             # khai báo rõ ràng: tải danh bạ instance về cache
+  instance:
+    prefer-ip-address: true          # đăng ký bằng IP — hữu ích khi scale/chạy container
+    # id duy nhất cho mỗi instance -> khi scale nhiều instance không bị đè lên nhau
+    instance-id: ${spring.application.name}:${random.value}
+    lease-renewal-interval-in-seconds: 30      # chu kỳ gửi heartbeat (mặc định 30s)
+    lease-expiration-duration-in-seconds: 90   # hết hạn lease sau 90s không heartbeat

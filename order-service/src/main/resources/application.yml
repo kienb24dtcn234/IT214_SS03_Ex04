@@ -1,0 +1,29 @@
+# application.yml của order-service
+# Cấu hình để luôn tra cứu danh sách instance mới nhất của restaurant-service qua Eureka
+
+spring:
+  application:
+    name: order-service
+
+server:
+  port: 8086
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true                 # tải danh bạ instance từ Eureka về
+    registry-fetch-interval-seconds: 15   # cập nhật danh bạ nhanh hơn (mặc định 30s)
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
+
+# Gợi ý cấu hình chịu lỗi (Resilience4j) — chống gọi trúng instance vừa chết
+resilience4j:
+  circuitbreaker:
+    instances:
+      restaurantService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
